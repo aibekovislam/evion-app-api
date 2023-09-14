@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 app.post('/register', async (req, res) => {
   try {
     const { username, phone, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
     const user = new User({ username, phone, password: hashedPassword });
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
@@ -41,7 +41,7 @@ app.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Authentication failed' });
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Authentication failed' });
     }
