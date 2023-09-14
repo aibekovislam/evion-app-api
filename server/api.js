@@ -6,8 +6,14 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import twilio from 'twilio';
 import crypto from 'crypto';
+import socketIo from 'socket.io';
+import http from 'http'; 
+
 
 dotenv.config();
+
+const server = http.createServer(app);
+const io = socketIo(server); 
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -114,6 +120,35 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+
+const userLocations = {};
+
+io.on('connection', (socket) => {
+  console.log('Client connected');
+
+  socket.on('locationUpdate', (data) => {
+    // Предположим, что data содержит поля latitude и longitude
+    const { latitude, longitude } = data;
+
+    // Сохраняем местоположение пользователя по идентификатору соксета
+    userLocations[socket.id] = { latitude, longitude };
+
+    // Отправляем обновленное местоположение всем клиентам
+    io.emit('updateLocations', userLocations);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+    delete userLocations[socket.id];
+    io.emit('updateLocations', userLocations);
+  });
+
+  // Отправляем текущее состояние местоположений клиенту при подключении
+  socket.emit('updateLocations', userLocations);
+});
+
+
+
+server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
