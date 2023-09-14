@@ -6,8 +6,10 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import twilio from 'twilio';
 import crypto from 'crypto';
-import socketIo from 'socket.io';
+
 import http from 'http'; 
+const socketIo = require('socket.io');
+
 
 
 dotenv.config();
