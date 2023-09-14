@@ -121,14 +121,6 @@ app.post('/login', async (req, res) => {
 
 const userLocations = {};
 
-app.get('/map', (req, res) => {
-  try {
-    // Ничего не нужно делать здесь
-  } catch (error) {
-    console.log(error);
-  }
-});
-
 io.on('connection', (socket) => {
   console.log('WebSocket Client connected');
 
