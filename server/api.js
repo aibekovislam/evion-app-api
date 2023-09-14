@@ -45,7 +45,7 @@ app.post('/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Authentication failed' });
     }
-    const token = jwt.sign({ userId: user._id }, 'secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'islamaibekov2005evion', { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Authentication failed' });
