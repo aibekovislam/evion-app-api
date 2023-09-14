@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 mongoose.connect('mongodb+srv://islamxdaamduu:200x30003x@cluster0.o882hth.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
