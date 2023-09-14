@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server, path: '/ws' });
+const wss = new WebSocket.Server({ server });
 
 const port = process.env.PORT || 4000;
 mongoose.connect(process.env.MONGODB_URI, { 
@@ -130,6 +130,7 @@ wss.on('connection', (socket) => {
       const { type, payload } = messageData;
 
       if (type === 'locationUpdate') {
+        // Обработка обновления местоположения пользователя
         const { latitude, longitude } = payload;
         userLocations[socket.id] = { latitude, longitude };
         wss.clients.forEach((client) => {
@@ -148,6 +149,7 @@ wss.on('connection', (socket) => {
     delete userLocations[socket.id];
   });
 
+  // Отправляем текущее состояние местоположений клиенту при подключении
   socket.send(JSON.stringify({ type: 'updateLocations', payload: userLocations }));
 });
 
