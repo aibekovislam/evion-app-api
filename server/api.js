@@ -7,13 +7,13 @@ import dotenv from 'dotenv';
 import twilio from 'twilio';
 import crypto from 'crypto';
 import http from 'http'; 
-import WebSocket from 'ws';
+import { Server as WebSocketServer } from 'socket.io';
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const io = new WebSocketServer(server);
 
 const port = process.env.PORT || 4000;
 mongoose.connect(process.env.MONGODB_URI, { 
@@ -121,36 +121,28 @@ app.post('/login', async (req, res) => {
 
 const userLocations = {};
 
-wss.on('connection', (socket) => {
+io.on('connection', (socket) => {
   console.log('WebSocket Client connected');
 
-  socket.on('message', (data) => {
-    try {
-      const messageData = JSON.parse(data);
-      const { type, payload } = messageData;
+  socket.on('locationUpdate', (data) => {
+    // Предположим, что data содержит поля latitude и longitude
+    const { latitude, longitude } = data;
 
-      if (type === 'locationUpdate') {
-        // Обработка обновления местоположения пользователя
-        const { latitude, longitude } = payload;
-        userLocations[socket.id] = { latitude, longitude };
-        wss.clients.forEach((client) => {
-          if (client !== socket && client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: 'updateLocations', payload: userLocations }));
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error processing WebSocket message:', error);
-    }
+    // Сохраняем местоположение пользователя по идентификатору соксета
+    userLocations[socket.id] = { latitude, longitude };
+
+    // Отправляем обновленное местоположение всем клиентам
+    io.emit('updateLocations', userLocations);
   });
 
-  socket.on('close', () => {
+  socket.on('disconnect', () => {
     console.log('WebSocket Client disconnected');
     delete userLocations[socket.id];
+    io.emit('updateLocations', userLocations);
   });
 
   // Отправляем текущее состояние местоположений клиенту при подключении
-  socket.send(JSON.stringify({ type: 'updateLocations', payload: userLocations }));
+  socket.emit('updateLocations', userLocations);
 });
 
 server.listen(port, () => {
