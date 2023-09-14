@@ -9,12 +9,11 @@ import crypto from 'crypto';
 import http from 'http'; 
 import { Server as WebSocketServer } from 'socket.io';
 
-const io = new WebSocketServer(server);
-
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const io = new WebSocketServer(server);
 
 const port = process.env.PORT || 4000;
 mongoose.connect(process.env.MONGODB_URI, { 
