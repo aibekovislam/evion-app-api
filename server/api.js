@@ -9,11 +9,12 @@ import crypto from 'crypto';
 import http from 'http'; 
 import { Server as WebSocketServer } from 'socket.io';
 
+const io = new WebSocketServer(server);
+
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new WebSocketServer(server);
 
 const port = process.env.PORT || 4000;
 mongoose.connect(process.env.MONGODB_URI, { 
@@ -121,17 +122,22 @@ app.post('/login', async (req, res) => {
 
 const userLocations = {};
 
+app.get('/map', (req, res) => {
+  try {
+    // Ничего не нужно делать здесь
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 io.on('connection', (socket) => {
   console.log('WebSocket Client connected');
 
   socket.on('locationUpdate', (data) => {
-    // Предположим, что data содержит поля latitude и longitude
     const { latitude, longitude } = data;
 
-    // Сохраняем местоположение пользователя по идентификатору соксета
     userLocations[socket.id] = { latitude, longitude };
 
-    // Отправляем обновленное местоположение всем клиентам
     io.emit('updateLocations', userLocations);
   });
 
@@ -141,9 +147,9 @@ io.on('connection', (socket) => {
     io.emit('updateLocations', userLocations);
   });
 
-  // Отправляем текущее состояние местоположений клиенту при подключении
   socket.emit('updateLocations', userLocations);
 });
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
