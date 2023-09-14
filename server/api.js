@@ -2,12 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const port = process.env.PORT || 4000;
-
-mongoose.connect('mongodb+srv://islamxdaamduu:200x30003x@cluster0.o882hth.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(process.env.MONGODB_URI, { 
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
