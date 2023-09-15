@@ -129,6 +129,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', async (req, res) => {
   try { 
+    console.log(userData)
     res.status(200).json({data: userData})
   } catch (error) {
     console.log(error)
