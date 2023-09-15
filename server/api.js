@@ -13,7 +13,6 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new WebSocketServer(server);
 
 const port = process.env.PORT || 4000;
 mongoose.connect(process.env.MONGODB_URI, { 
@@ -120,26 +119,6 @@ app.post('/login', async (req, res) => {
 });
 
 const userLocations = {};
-
-io.on('connection', (socket) => {
-  console.log('WebSocket Client connected');
-
-  socket.on('locationUpdate', (data) => {
-    const { latitude, longitude } = data;
-
-    userLocations[socket.id] = { latitude, longitude };
-
-    io.emit('updateLocations', userLocations);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('WebSocket Client disconnected');
-    delete userLocations[socket.id];
-    io.emit('updateLocations', userLocations);
-  });
-
-  socket.emit('updateLocations', userLocations);
-});
 
 
 server.listen(port, () => {
