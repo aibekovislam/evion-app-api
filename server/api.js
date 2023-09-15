@@ -55,6 +55,8 @@ app.use(bodyParser.json());
 
 app.post('/register', async (req, res) => {
   try {
+    const { username, phone, password } = req.body;
+
     const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({ error: 'Пользователь с таким номером уже зарегистрирован' });
