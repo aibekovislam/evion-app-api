@@ -102,23 +102,29 @@ app.post('/verify', async (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { phone, password } = req.body;
-    console.log(req.body)
-    const user = await User.findOne({ phone });
-    if (!user) {
-      return res.status(401).json({ error: 'Authentication failed' });
+    const existingUser = await User.findOne({ phone });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Пользователь с таким номером уже зарегистрирован' });
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Authentication failed' });
-    }
-    const token = jwt.sign({ userId: user._id }, 'islamaibekov2005evion', { expiresIn: '1h' });
-    res.status(200).json({ token });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationCode = generateVerificationCode();
+    const user = new User({
+      username,
+      phone,
+      password: hashedPassword,
+      verificationCode,
+      isVerified: false,
+    });
+    await user.save();
+
+    await sendVerificationCode(user.phone, user.verificationCode);
+
+    res.status(201).json({ message: 'Пользователь успешно зарегистрирован' });
   } catch (error) {
     res.status(500).json({ error: 'Authentication failed' });
   }
 });
-
-const userLocations = {};
 
 
 server.listen(port, () => {
