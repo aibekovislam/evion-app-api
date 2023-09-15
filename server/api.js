@@ -76,21 +76,13 @@ app.post('/register', async (req, res) => {
 
     await sendVerificationCode(user.phone, user.verificationCode);
 
-    userData.push(user)
+    
     res.status(201).json({ message: 'Пользователь успешно зарегистрирован', data: user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
-
-app.get('/profile', async (req, res) => {
-  try { 
-    res.status(200).json({data: userData})
-  } catch (error) {
-    console.log(error)
-  }
-})
 
 app.post('/verify', async (req, res) => {
   try {
@@ -128,11 +120,20 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Authentication failed' });
     }
     const token = jwt.sign({ userId: user._id }, 'islamaibekov2005evion', { expiresIn: '1h' });
+    userData.push(user)
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Authentication failed' });
   }
 });
+
+app.get('/profile', async (req, res) => {
+  try { 
+    res.status(200).json({data: userData})
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
