@@ -128,13 +128,13 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/profile', async (req, res) => {
-  try { 
-    console.log(JSON.parse(userData))
-    res.status(200).json({userData})
+  try {
+    res.status(200).json({ userData });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-})
+});
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
