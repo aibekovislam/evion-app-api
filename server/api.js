@@ -53,6 +53,8 @@ async function sendVerificationCode(phoneNumber, code) {
 
 app.use(bodyParser.json());
 
+let userData = [];
+
 app.post('/register', async (req, res) => {
   try {
     const { username, phone, password } = req.body;
@@ -74,12 +76,21 @@ app.post('/register', async (req, res) => {
 
     await sendVerificationCode(user.phone, user.verificationCode);
 
-    res.status(201).json({ message: 'Пользователь успешно зарегистрирован' });
+    userData.push(user)
+    res.status(201).json({ message: 'Пользователь успешно зарегистрирован', data: user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
+
+app.get('/profile', async (req, res) => {
+  try { 
+    res.status(200).json({data: userData})
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 app.post('/verify', async (req, res) => {
   try {
