@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import twilio from 'twilio';
 import crypto from 'crypto';
 import http from 'http'; 
-import { Server as WebSocketServer } from 'socket.io';
 
 dotenv.config();
 
@@ -129,6 +128,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', async (req, res) => {
   try {
+    console.log(userData)
     res.status(200).json({ userData });
   } catch (error) {
     console.log(error);
