@@ -52,7 +52,6 @@ async function sendVerificationCode(phoneNumber, code) {
 
 app.use(bodyParser.json());
 
-let userData = [];
 
 app.post('/register', async (req, res) => {
   try {
@@ -119,7 +118,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Authentication failed' });
     }
     const token = jwt.sign({ userId: user._id }, 'islamaibekov2005evion', { expiresIn: '1h' });
-    userData.push(user)
+
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Authentication failed' });
@@ -128,12 +127,28 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', async (req, res) => {
   try {
-    console.log(userData)
-    res.status(200).json({ userData });
+    const token = req.headers.authorization;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const decodedToken = jwt.verify(token, 'islamaibekov2005evion');
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ user });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve profile' });
   }
 });
+
 
 
 server.listen(port, () => {
