@@ -148,7 +148,7 @@ app.get('/profile', async (req, res) => {
 
     console.log({user});
 
-    res.status(200).json({ user: { ...user._doc, wallet } });
+    res.status(200).json({ user: { ...user._doc, walletBalance } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to retrieve profile' });
