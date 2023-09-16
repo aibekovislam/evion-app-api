@@ -25,6 +25,10 @@ const User = mongoose.model('User', {
   password: String,
   verificationCode: String,
   isVerified: Boolean,
+  wallet: {
+    walletBalance: Number,
+    transactions: []
+  }
 });
 
 function generateVerificationCode() {
@@ -51,7 +55,6 @@ async function sendVerificationCode(phoneNumber, code) {
 }
 
 app.use(bodyParser.json());
-
 
 app.post('/register', async (req, res) => {
   try {
@@ -141,14 +144,79 @@ app.get('/profile', async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    console.log({user})
-    res.status(200).json({ user });
+    const walletBalance = user.walletBalance;
+
+    console.log({user});
+
+    res.status(200).json({ user: { ...user._doc, walletBalance } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to retrieve profile' });
   }
 });
 
+
+app.post('/add-funds', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.walletBalance += amount;
+    await user.save();
+
+    res.status(200).json({ message: 'Funds added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to add funds' });
+  }
+});
+
+app.post('/withdraw-funds', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.walletBalance < amount) {
+      return res.status(400).json({ error: 'Insufficient funds' });
+    }
+
+    user.walletBalance -= amount;
+    await user.save();
+
+    res.status(200).json({ message: 'Funds withdrawn successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to withdraw funds' });
+  }
+});
+
+app.get('/wallet-balance', async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const walletBalance = user.walletBalance;
+
+    res.status(200).json({ walletBalance });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve wallet balance' });
+  }
+});
 
 
 server.listen(port, () => {
