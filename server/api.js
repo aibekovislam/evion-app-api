@@ -26,7 +26,7 @@ const User = mongoose.model('User', {
   verificationCode: String,
   isVerified: Boolean,
   wallet: {
-    walletBalance: Number,
+    walletBalance: String,
     transactions: []
   }
 });
