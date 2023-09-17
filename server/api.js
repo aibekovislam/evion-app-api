@@ -31,6 +31,13 @@ const User = mongoose.model('User', {
   }
 });
 
+const Locations = mongoose.model('Locations', {
+  name: String,
+  variant: String,
+  latitude: Number,
+  longitude: Number,
+})
+
 function generateVerificationCode() {
   const code = crypto.randomBytes(4).toString('hex').toUpperCase();
   return code;
@@ -217,6 +224,19 @@ app.get('/wallet-balance', async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve wallet balance' });
   }
 });
+
+
+app.get('/locations', async (req, res) => {
+  try {
+    const locations = await Locations.find();
+
+    res.status(200).json({ locations });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to retrieve locations' });
+  }
+});
+
 
 
 server.listen(port, () => {
