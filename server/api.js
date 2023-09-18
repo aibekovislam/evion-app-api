@@ -33,7 +33,7 @@ const User = mongoose.model('User', {
 
 const Locations = mongoose.model('Locations', {
   name: String,
-  variant: String,
+  variant: [],
   latitude: Number,
   longitude: Number,
 })
