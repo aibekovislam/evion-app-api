@@ -259,6 +259,50 @@ app.post('/change_status/:id', async (req, res) => {
   }
 })
 
+app.post('/change_client_count/:id', async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const user = await User.findById(user_id);
+    const newCount = req.body.count;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if(user.status === false) {
+      return res.status(401).json({ error: 'User not active' });
+    } 
+
+    user.clients_count = newCount;
+
+    res.status(200).json({ newCount: user.clients_count })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed' })
+  }
+})
+
+app.post('/change_client_dec_count/:id', async (req, res) => {
+  try {
+    const user_id = req.params.id;
+    const user = await User.findById(user_id);
+    const newCount = req.body.count;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if(user.status === false) {
+      return res.status(401).json({ error: 'User not active' });
+    } 
+
+    user.clients_count = newCount;
+    
+    res.status(200).json({ newCount: user.clients_count })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed' })
+  }
+})
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
