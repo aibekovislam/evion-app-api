@@ -251,7 +251,7 @@ app.post('/change_status/:id', async (req, res) => {
     user.status = !user.status;
     await user.save();
 
-    res.status(200).json({ staus: user.status });
+    res.status(200).json({ status: user.status });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Failed' })
