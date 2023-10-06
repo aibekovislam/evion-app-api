@@ -241,7 +241,7 @@ app.get('/locations', async (req, res) => {
 app.post('/change_status/:id', async (req, res) => {
   try {
     const user_id = req.params.id;
-    const user_status = req.body
+    const user_status = req.body.status;
     const user = await User.findById(user_id);
 
     if (!user) {
