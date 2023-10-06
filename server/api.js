@@ -28,7 +28,8 @@ const User = mongoose.model('User', {
   wallet: {
     walletBalance: String,
     transactions: []
-  }
+  },
+  status: Boolean
 });
 
 const Locations = mongoose.model('Locations', {
@@ -237,6 +238,25 @@ app.get('/locations', async (req, res) => {
   }
 });
 
+app.post('/change_status/:id', async (req, res) => {
+  try {
+    const user_id = req.params.id;
+
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.status = !user.status;
+    await user.save();
+
+    res.status(200).json({ message: 'Статус пользователя успешно изменен' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed' })
+  }
+})
 
 
 server.listen(port, () => {
